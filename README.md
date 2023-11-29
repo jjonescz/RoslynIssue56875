@@ -1,5 +1,5 @@
 ```ps1
-dotnet run -f net8.0 --runtimes net8.0 net481
+dotnet run -f net8.0
 ```
 
 ```

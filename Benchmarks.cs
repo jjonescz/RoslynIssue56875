@@ -9,17 +9,32 @@ namespace RoslynIssue56875
     [DisassemblyDiagnoser(maxDepth: 0, printSource: true, exportHtml: true, exportCombinedDisassemblyReport: true, exportDiff: true)]
     public class Benchmarks
     {
+        private static readonly Random random = new();
+
         public IEnumerable<object> Inputs()
         {
-            //yield return null;
-            yield return new DateTime(2023, 11, 28);
-            //yield return DateTime.MaxValue;
+            yield return random.Next(3) switch
+            {
+                0 => null,
+                1 => new DateTime(2023, 11, 28),
+                2 => DateTime.MaxValue,
+            };
         }
 
         [Benchmark(Baseline = true), ArgumentsSource(nameof(Inputs))]
-        public bool Before(DateTime? d) => d == DateTime.MaxValue;
+        public bool Before(DateTime? d)
+        {
+            var x = d;
+            var y = DateTime.MaxValue;
+            return x.HasValue == true ? (x.HasValue ? x.GetValueOrDefault() == y : true) : false;
+        }
 
         [Benchmark, ArgumentsSource(nameof(Inputs))]
-        public bool After(DateTime? d) => d.HasValue && d.GetValueOrDefault() == DateTime.MaxValue;
+        public bool After(DateTime? d)
+        {
+            var x = d;
+            var y = DateTime.MaxValue;
+            return x.HasValue == true ? x.GetValueOrDefault() == y : false;
+        }
     }
 }
